@@ -1,0 +1,8 @@
+
+¨
+java:S1488X"`Immediately return this expression instead of assigning it to the temporary variable "employee".(·Î™øÿÿÿÿ8±•îêì1J$1a46f182-c667-4952-a784-f66d89046298
+¡	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(úÓ÷±ûÿÿÿÿ8²•îêì1J$8a3ebc3c-0df0-4538-8db5-b1198f0606d7
+
+java:S2259"GA "NullPointerException" could be thrown; "employees" is nullable here.(ÊÄâ¼ùÿÿÿÿ8ı¾‡ëì1J$bf878595-cb4e-48af-b1a7-676372097b02
+”
+java:S2095."LUse try-with-resources or close this "BufferedReader" in a "finally" clause.(µÎ Àúÿÿÿÿ8Û•îêì1J$8bdc7a3b-9499-4eae-aa79-6ae0ffb65f95
