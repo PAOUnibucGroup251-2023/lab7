@@ -7,9 +7,7 @@ import ex5.model.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 import java.util.random.RandomGenerator;
 
 public class Runner {
@@ -17,7 +15,7 @@ public class Runner {
         System.out.println("Enter number of employees: ");
         Scanner sc = new Scanner(System.in);
         int numberOfEmployees = Integer.parseInt(sc.nextLine());
-        Employee[] employees = null;
+        Set<Employee> employees = new HashSet<>();
         try {
             employees = readEmployees(numberOfEmployees, sc);
         } catch (Exception e) {
@@ -28,7 +26,8 @@ public class Runner {
         displayEmployees(employees);
 
         try {
-            System.out.println(searchEmployee(sc, employees));
+            Employee emp = searchEmployee(sc, employees).orElseThrow();
+            System.out.println(emp.tabular());
         } catch (EmployeeNotFoundException | NoEmployeesPresentException e) { //the checked exception will oblige us
             // to either declare it in the method signature or handle it in a try-catch or try-with-resources block
             //otherwise it will not compile
@@ -36,35 +35,31 @@ public class Runner {
         }
     }
 
-    private static Employee searchEmployee(Scanner sc, Employee[] employees) throws NoEmployeesPresentException {
+    private static Optional<Employee> searchEmployee(Scanner sc, Set<Employee> employees) throws NoEmployeesPresentException {
         System.out.println("Enter the name of the employee to search: ");
         System.out.println("First Name: ");
         String firstName = sc.nextLine();
         System.out.println("Last Name: ");
         String lastName = sc.nextLine();
 
-        if (employees == null || employees.length == 0){
+        if (employees == null || employees.isEmpty()){
             throw new NoEmployeesPresentException();
         }
 
-        for (Employee e : employees) {
-            if (e.firstName().equals(firstName) && e.lastName().equals(lastName)) {
-                return e;
-            }
-        }
-
-        throw new EmployeeNotFoundException();
+        return Optional.ofNullable(employees.stream().filter(employee -> employee.firstName().equals(firstName) && employee.lastName().equals(lastName))
+                .findFirst().orElseThrow(EmployeeNotFoundException::new));
     }
 
-    private static Employee[] readEmployees(int numberOfEmployees, Scanner sc) throws IOException {
-        Employee[] employees = readEmployees("employees");
-        int fileEmployees = employees.length;
+
+
+    private static Set<Employee> readEmployees(int numberOfEmployees, Scanner sc) throws IOException {
+        Set<Employee> employees = readEmployees("employees");
+        int fileEmployees = employees.size();
         System.out.printf("Read %d employees%n", fileEmployees);
-        employees = Arrays.copyOf(employees, employees.length + numberOfEmployees - 1);
 
         for (int i = 0; i < numberOfEmployees; i++) {
             try {
-                employees[fileEmployees -1 + i] = readEmployee(i, sc, numberOfEmployees);
+                employees.add(readEmployee(i, sc, numberOfEmployees));
             } catch (Exception e) {
                 System.out.println("Error reading employee: " + e.getMessage());
                 System.exit(1);
@@ -73,10 +68,10 @@ public class Runner {
         return employees;
     }
 
-    private static Employee[] readEmployees(String filename) throws IOException {
+    private static Set<Employee> readEmployees(String filename) throws IOException {
+        Set<Employee> employees = new HashSet<>();
         FileReader fileReader = new FileReader(filename);
         BufferedReader bufferedReader = new BufferedReader(fileReader);
-        Employee[] employees = null;
         String line;
 
         do {
@@ -88,12 +83,7 @@ public class Runner {
                     fields[0],
                     fields[1], Long.parseLong(fields[2])):null;
             if(employee != null) {
-                if (employees == null) {
-                    employees = new Employee[1];
-                } else {
-                    employees = Arrays.copyOf(employees, employees.length + 1);
-                }
-                employees[employees.length - 1] = employee;
+                employees.add(employee);
             }
         } while (!line.equals("end"));
         bufferedReader.close();
@@ -119,8 +109,7 @@ public class Runner {
             System.exit(1);
         }
 
-        Employee employee = createEmployee(role, firstName, lastName, employeeID);
-        return employee;
+        return createEmployee(role, firstName, lastName, employeeID);
     }
 
 
@@ -133,9 +122,9 @@ public class Runner {
         };
     }
 
-    private static void displayEmployees(Employee[] employees) {
-        for (int i = 0; i < employees.length; i++) {
-            System.out.printf("%d. \t %s%n", i + 1, employees[i].tabular());
+    private static void displayEmployees(Set<Employee> employees) {
+        for (Employee employee: employees) {
+            System.out.printf("%s%n", employee.tabular());
         }
     }
 }
